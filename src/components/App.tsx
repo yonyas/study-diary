@@ -1,10 +1,15 @@
 import { useState } from 'react'
-import RouterRender from './Router'
+import RouterRender from '../routes/Router'
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
-  return <RouterRender isLoggedIn={isLoggedIn} />
+  return (
+    <>
+      <RouterRender isLoggedIn={isLoggedIn} />
+      <footer>&copy; {new Date().getFullYear()} Study diary</footer>
+    </>
+  )
 }
 
 export default App

@@ -1,7 +1,7 @@
 import { HashRouter as Router, Routes, Route } from 'react-router-dom'
 
-import Auth from '../routes/Auth'
-import Home from '../routes/Home'
+import AuthPage from './AuthPage'
+import HomePage from './HomePage'
 
 interface Props {
   isLoggedIn: boolean
@@ -13,10 +13,10 @@ const RouterRender = ({ isLoggedIn }: Props) => {
       <Routes>
         {isLoggedIn ? (
           <>
-            <Route path="/" element={<Home />}></Route>
+            <Route path="/" element={<HomePage />}></Route>
           </>
         ) : (
-          <Route path="/" element={<Auth />}></Route>
+          <Route path="/" element={<AuthPage />}></Route>
         )}
       </Routes>
     </Router>
