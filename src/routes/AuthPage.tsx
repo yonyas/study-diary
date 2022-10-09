@@ -1,4 +1,4 @@
-import Auth from 'components/Auth/Auth'
+import Auth from 'components/Auth'
 
 function AuthPage() {
   return <Auth />

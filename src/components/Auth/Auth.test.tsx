@@ -3,7 +3,14 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 
-import Auth from './Auth'
+import Auth from '.'
+
+function setup(jsx: ReactElement) {
+  return {
+    user: userEvent.setup(),
+    ...render(jsx),
+  }
+}
 
 function setup(jsx: ReactElement) {
   return {

@@ -2,6 +2,7 @@ import { HashRouter as Router, Routes, Route } from 'react-router-dom'
 
 import AuthPage from './AuthPage'
 import HomePage from './HomePage'
+import SighUpPage from './SignUpPage'
 
 interface Props {
   isLoggedIn: boolean
@@ -18,6 +19,7 @@ const RouterRender = ({ isLoggedIn }: Props) => {
         ) : (
           <Route path="/" element={<AuthPage />}></Route>
         )}
+        <Route path="/signup" element={<SighUpPage />}></Route>
       </Routes>
     </Router>
   )
