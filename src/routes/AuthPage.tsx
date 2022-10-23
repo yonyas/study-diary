@@ -1,7 +1,7 @@
-import Auth from 'components/Auth'
+import SignIn from 'components/SginIn'
 
-function AuthPage() {
-  return <Auth />
+function SignInPage() {
+  return <SignIn />
 }
 
-export default AuthPage
+export default SignInPage

@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 
-import Auth from '.'
+import SignIn from '.'
 
 function setup(jsx: ReactElement) {
   return {
@@ -20,7 +20,7 @@ function setup(jsx: ReactElement) {
 }
 
 test('display login page', async () => {
-  render(<Auth />)
+  render(<SignIn />)
 
   const emailInput = await screen.findByLabelText('email')
 
@@ -28,11 +28,11 @@ test('display login page', async () => {
 })
 
 test('enter email input', async () => {
-  render(<Auth />)
+  render(<SignIn />)
 
   const emailInput = await screen.findByLabelText('email')
 
-  const { user } = setup(<Auth />)
+  const { user } = setup(<SignIn />)
   await user.type(emailInput, 'aaa@gmail.com')
 
   expect(screen.getByDisplayValue('aaa@gmail.com')).toBeInTheDocument()

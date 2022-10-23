@@ -1,12 +1,12 @@
 import { UseFormRegister } from 'react-hook-form'
 
-import { LoginInputs } from '.'
+import { AuthInputs } from 'types'
 
 type Props = {
-  register: UseFormRegister<LoginInputs>
+  register: UseFormRegister<AuthInputs>
 }
 
-function LoginForm({ register }: Props) {
+function AuthForm({ register }: Props) {
   return (
     <div>
       <div className="-space-y-px rounded-md shadow-sm">
@@ -42,4 +42,4 @@ function LoginForm({ register }: Props) {
   )
 }
 
-export default LoginForm
+export default AuthForm
