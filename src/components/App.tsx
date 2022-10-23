@@ -7,7 +7,6 @@ function App() {
   return (
     <>
       <RouterRender isLoggedIn={isLoggedIn} />
-      <footer>&copy; {new Date().getFullYear()} Study diary</footer>
     </>
   )
 }
