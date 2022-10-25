@@ -1,16 +1,20 @@
 import { Auth as AuthType, getAuth } from 'firebase/auth'
 import { firebaseApp } from 'firebaseAuth'
+import { Dispatch, SetStateAction } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
+
 import { AuthInputs } from 'types'
 import AuthForm from './AuthForm'
 
 type Props = {
   pageName: 'Sign in' | 'Sign up'
+  errorMsg?: string
+  setErrorMsg: Dispatch<SetStateAction<string>>
   onSubmit: (auth: AuthType) => SubmitHandler<AuthInputs>
 }
 
-function Auth({ pageName, onSubmit }: Props) {
+function Auth({ pageName, errorMsg, setErrorMsg, onSubmit }: Props) {
   const {
     register,
     handleSubmit,
@@ -33,19 +37,23 @@ function Auth({ pageName, onSubmit }: Props) {
           className="mt-8 space-y-6"
           onSubmit={handleSubmit(onSubmit(auth))}
         >
-          <AuthForm register={register} />
+          <AuthForm register={register} setErrorMsg={setErrorMsg} />
 
-          {(errors.email || errors.password) && (
+          {errors.email || errors.password ? (
             <span className="text-gray-900 sm:text-sm">
-              This field is required
+              {errors.email?.message || errors.password?.message}
             </span>
+          ) : (
+            errorMsg && (
+              <span className="text-gray-900 sm:text-sm">{errorMsg}</span>
+            )
           )}
 
           {pageName === 'Sign in' && (
-            <div className="text-sm flex justify-end">
+            <div className="text-sm flex justify-end m-0">
               <a
                 href="#"
-                className="font-medium text-indigo-600 hover:text-indigo-500"
+                className="font-medium text-indigo-600 hover:text-indigo-500 m-0"
               >
                 Forgot your password?
               </a>

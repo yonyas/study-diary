@@ -12,13 +12,6 @@ function setup(jsx: ReactElement) {
   }
 }
 
-function setup(jsx: ReactElement) {
-  return {
-    user: userEvent.setup(),
-    ...render(jsx),
-  }
-}
-
 test('display login page', async () => {
   render(<SignIn />)
 
