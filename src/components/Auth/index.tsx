@@ -1,16 +1,20 @@
 import { Auth as AuthType, getAuth } from 'firebase/auth'
 import { firebaseApp } from 'firebaseAuth'
+import { Dispatch, SetStateAction } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
+
 import { AuthInputs } from 'types'
-import AuthForm from './AuthForm'
+import EmailPWForm from './EmailPWForm'
 
 type Props = {
   pageName: 'Sign in' | 'Sign up'
+  errorMsg?: string
+  setErrorMsg: Dispatch<SetStateAction<string>>
   onSubmit: (auth: AuthType) => SubmitHandler<AuthInputs>
 }
 
-function Auth({ pageName, onSubmit }: Props) {
+function Auth({ pageName, errorMsg, setErrorMsg, onSubmit }: Props) {
   const {
     register,
     handleSubmit,
@@ -26,26 +30,30 @@ function Auth({ pageName, onSubmit }: Props) {
     <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-          {`${pageName} to your account`}
+          {pageName}
         </h2>
 
         <form
           className="mt-8 space-y-6"
           onSubmit={handleSubmit(onSubmit(auth))}
         >
-          <AuthForm register={register} />
+          <EmailPWForm register={register} setErrorMsg={setErrorMsg} />
 
-          {(errors.email || errors.password) && (
-            <span className="text-gray-900 sm:text-sm">
-              This field is required
+          {errors.email || errors.password ? (
+            <span className="text-red-600 sm:text-sm">
+              {errors.email?.message || errors.password?.message}
             </span>
+          ) : (
+            errorMsg && (
+              <span className="text-red-600 sm:text-sm">{errorMsg}</span>
+            )
           )}
 
           {pageName === 'Sign in' && (
-            <div className="text-sm flex justify-end">
+            <div className="text-sm flex justify-end m-0">
               <a
                 href="#"
-                className="font-medium text-indigo-600 hover:text-indigo-500"
+                className="font-medium text-indigo-600 hover:text-indigo-500 m-0"
               >
                 Forgot your password?
               </a>

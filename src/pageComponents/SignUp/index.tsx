@@ -1,10 +1,13 @@
+import { useState } from 'react'
+import { FirebaseError } from 'firebase/app'
 import { Auth as AuthType, createUserWithEmailAndPassword } from 'firebase/auth'
 
-import Auth from 'components/Auth'
 import { AuthInputs } from 'types'
-import { FirebaseError } from 'firebase/app'
+import Auth from 'components/Auth'
 
 function SignUp() {
+  const [errorMsg, setErrorMsg] = useState<string>('')
+
   const handleSignUpSubmit = (auth: AuthType) => async (data: AuthInputs) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(
@@ -16,12 +19,19 @@ function SignUp() {
       console.log(userCredential.user)
     } catch (err) {
       const errorCode = (err as FirebaseError).code
-      const errorMessage = (err as FirebaseError).message
-      console.log(errorCode, errorMessage)
+      console.log(errorCode)
+      setErrorMsg('이미 사용중인 이메일입니다')
     }
   }
 
-  return <Auth pageName="Sign up" onSubmit={handleSignUpSubmit} />
+  return (
+    <Auth
+      pageName="Sign up"
+      errorMsg={errorMsg}
+      setErrorMsg={setErrorMsg}
+      onSubmit={handleSignUpSubmit}
+    />
+  )
 }
 
 export default SignUp
