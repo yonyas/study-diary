@@ -4,9 +4,11 @@ import { Auth as AuthType, signInWithEmailAndPassword } from 'firebase/auth'
 
 import { AuthInputs } from 'types'
 import Auth from 'components/Auth'
+import { useLocalStorage } from 'hooks/useLocalStorage'
 
 function SignIn() {
   const [errorMsg, setErrorMsg] = useState<string>('')
+  const [_, setUser] = useLocalStorage('user', {})
 
   const handleSignInSubmit = (auth: AuthType) => async (data: AuthInputs) => {
     try {
@@ -16,7 +18,7 @@ function SignIn() {
         data.password,
       )
 
-      console.log(userCredential.user)
+      setUser(userCredential.user)
     } catch (err) {
       const errorCode = (err as FirebaseError).code
       console.log(errorCode)

@@ -9,7 +9,7 @@ type Props = {
   setErrorMsg: Dispatch<SetStateAction<string>>
 }
 
-function AuthForm({ register, setErrorMsg }: Props) {
+function EmailPWForm({ register, setErrorMsg }: Props) {
   return (
     <div>
       <div className="-space-y-px rounded-md shadow-sm">
@@ -50,4 +50,4 @@ function AuthForm({ register, setErrorMsg }: Props) {
   )
 }
 
-export default AuthForm
+export default EmailPWForm

@@ -5,7 +5,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 
 import { AuthInputs } from 'types'
-import AuthForm from './AuthForm'
+import EmailPWForm from './EmailPWForm'
 
 type Props = {
   pageName: 'Sign in' | 'Sign up'
@@ -30,22 +30,22 @@ function Auth({ pageName, errorMsg, setErrorMsg, onSubmit }: Props) {
     <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-          {`${pageName} to your account`}
+          {pageName}
         </h2>
 
         <form
           className="mt-8 space-y-6"
           onSubmit={handleSubmit(onSubmit(auth))}
         >
-          <AuthForm register={register} setErrorMsg={setErrorMsg} />
+          <EmailPWForm register={register} setErrorMsg={setErrorMsg} />
 
           {errors.email || errors.password ? (
-            <span className="text-gray-900 sm:text-sm">
+            <span className="text-red-600 sm:text-sm">
               {errors.email?.message || errors.password?.message}
             </span>
           ) : (
             errorMsg && (
-              <span className="text-gray-900 sm:text-sm">{errorMsg}</span>
+              <span className="text-red-600 sm:text-sm">{errorMsg}</span>
             )
           )}
 
