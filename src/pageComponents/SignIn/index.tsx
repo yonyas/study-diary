@@ -1,24 +1,26 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { FirebaseError } from 'firebase/app'
-import { Auth as AuthType, signInWithEmailAndPassword } from 'firebase/auth'
+import { Auth as AuthType } from 'firebase/auth'
 
 import { AuthInputs } from 'types'
-import Auth from 'components/Auth'
-import { useLocalStorage } from 'hooks/useLocalStorage'
+import SigninAndSignup from 'components/SigninAndSignup'
 
 function SignIn() {
   const [errorMsg, setErrorMsg] = useState<string>('')
-  const [_, setUser] = useLocalStorage('user', {})
+  const navigate = useNavigate()
 
   const handleSignInSubmit = (auth: AuthType) => async (data: AuthInputs) => {
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        data.email,
-        data.password,
-      )
+      //TODO: user 필요할 때 활용
+      // const userCredential = await signInWithEmailAndPassword(
+      //   auth,
+      //   data.email,
+      //   data.password,
+      // )
+      //userCredential.user
 
-      setUser(userCredential.user)
+      navigate('/')
     } catch (err) {
       const errorCode = (err as FirebaseError).code
       console.log(errorCode)
@@ -27,7 +29,7 @@ function SignIn() {
   }
 
   return (
-    <Auth
+    <SigninAndSignup
       pageName="Sign in"
       errorMsg={errorMsg}
       setErrorMsg={setErrorMsg}
