@@ -2,24 +2,30 @@ import { HashRouter as Router, Routes, Route } from 'react-router-dom'
 
 import SignInPage from './AuthPage'
 import HomePage from './HomePage'
-import SighUpPage from './SignUpPage'
+import SignUpPage from './SignUpPage'
+import Loading from 'components/Loading'
 
 interface Props {
-  isLoggedIn: boolean
+  authState: any
 }
 
-const RouterRender = ({ isLoggedIn }: Props) => {
+const RouterRender = ({ authState }: Props) => {
+  const initialElement = !authState.isLoading ? (
+    authState.user ? (
+      <HomePage />
+    ) : (
+      <SignInPage />
+    )
+  ) : (
+    <Loading />
+  )
+
   return (
     <Router>
       <Routes>
-        {isLoggedIn ? (
-          <>
-            <Route path="/" element={<HomePage />}></Route>
-          </>
-        ) : (
-          <Route path="/" element={<SignInPage />}></Route>
-        )}
-        <Route path="/signup" element={<SighUpPage />}></Route>
+        <Route path="/" element={initialElement} />
+        <Route path="/signin" element={<SignInPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
       </Routes>
     </Router>
   )
