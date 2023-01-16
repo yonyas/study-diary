@@ -13,16 +13,16 @@ export const signOut = () => firebaseSignOut(firebaseAuth)
 
 export function useAuthState() {
   const [user, setUser] = useState<null | any>(firebaseAuth.currentUser)
+  const [isLoading, setIsLoading] = useState(true)
 
   onAuthStateChanged(firebaseAuth, (user) => {
     if (user) {
+      setIsLoading(false)
       return setUser(user)
     } else {
-      return undefined
+      setIsLoading(false)
     }
   })
-
-  const isLoading = user === null
 
   return { user, isLoading }
 }

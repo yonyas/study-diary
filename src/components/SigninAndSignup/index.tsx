@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import {
   Auth as AuthType,
   GithubAuthProvider,
+  GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth'
 import { FirebaseError } from 'firebase/app'
@@ -28,26 +29,38 @@ function SigninAndSignup({ pageName, errorMsg, setErrorMsg, onSubmit }: Props) {
 
   const navigate = useNavigate()
 
-  const handleGithubLoginClick = async () => {
-    const provider = new GithubAuthProvider()
-    try {
-      const res = await signInWithPopup(firebaseAuth, provider)
-      const credential = GithubAuthProvider.credentialFromResult(res)
-      const token = credential?.accessToken
-      const user = res.user
+  const socialLogin = {
+    github: GithubAuthProvider,
+    google: GoogleAuthProvider,
+    onClick: async function async(socialType: 'github' | 'google') {
+      const socialProvider = this[socialType]
+      const provider = new socialProvider()
+      try {
+        const res = await signInWithPopup(firebaseAuth, provider)
+        const credential = socialProvider.credentialFromResult(res)
+        const token = credential?.accessToken
+        const user = res.user
 
-      if (user && token) {
-        navigate('/')
+        if (user && token) {
+          navigate('/')
+        }
+      } catch (err) {
+        console.log(err)
+        const credential = socialProvider.credentialFromError(
+          err as FirebaseError,
+        )
+        console.log('credential : ', credential)
       }
-    } catch (err) {
-      console.log(err)
-      const credential = GithubAuthProvider.credentialFromError(
-        err as FirebaseError,
-      )
-      console.log('credential : ', credential)
-    }
+    },
   }
-  const handleGoogleLoginClick = () => {}
+
+  const handleGithubLoginClick = async () => {
+    socialLogin.onClick('github')
+  }
+
+  const handleGoogleLoginClick = async () => {
+    socialLogin.onClick('google')
+  }
 
   return (
     <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
