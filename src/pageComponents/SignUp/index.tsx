@@ -3,7 +3,7 @@ import { FirebaseError } from 'firebase/app'
 import { Auth as AuthType, createUserWithEmailAndPassword } from 'firebase/auth'
 
 import { AuthInputs } from 'types'
-import Auth from 'components/Auth'
+import SigninAndSignup from 'components/SigninAndSignup'
 
 function SignUp() {
   const [errorMsg, setErrorMsg] = useState<string>('')
@@ -25,7 +25,7 @@ function SignUp() {
   }
 
   return (
-    <Auth
+    <SigninAndSignup
       pageName="Sign up"
       errorMsg={errorMsg}
       setErrorMsg={setErrorMsg}

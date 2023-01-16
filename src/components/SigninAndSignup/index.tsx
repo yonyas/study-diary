@@ -1,11 +1,17 @@
-import { Auth as AuthType, getAuth } from 'firebase/auth'
-import { firebaseApp } from 'firebaseAuth'
 import { Dispatch, SetStateAction } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import {
+  Auth as AuthType,
+  GithubAuthProvider,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth'
+import { FirebaseError } from 'firebase/app'
 
 import { AuthInputs } from 'types'
 import EmailPWForm from './EmailPWForm'
+import { firebaseAuth } from 'Auth/useAuthState'
 
 type Props = {
   pageName: 'Sign in' | 'Sign up'
@@ -14,17 +20,47 @@ type Props = {
   onSubmit: (auth: AuthType) => SubmitHandler<AuthInputs>
 }
 
-function Auth({ pageName, errorMsg, setErrorMsg, onSubmit }: Props) {
+function SigninAndSignup({ pageName, errorMsg, setErrorMsg, onSubmit }: Props) {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<AuthInputs>()
-  const auth = getAuth(firebaseApp)
 
-  const handleGithubLoginClick = () => {}
-  const handleGoogleLoginClick = () => {}
+  const navigate = useNavigate()
+
+  const socialLogin = {
+    github: GithubAuthProvider,
+    google: GoogleAuthProvider,
+    onClick: async function async(socialType: 'github' | 'google') {
+      const socialProvider = this[socialType]
+      const provider = new socialProvider()
+      try {
+        const res = await signInWithPopup(firebaseAuth, provider)
+        const credential = socialProvider.credentialFromResult(res)
+        const token = credential?.accessToken
+        const user = res.user
+
+        if (user && token) {
+          navigate('/')
+        }
+      } catch (err) {
+        console.log(err)
+        const credential = socialProvider.credentialFromError(
+          err as FirebaseError,
+        )
+        console.log('credential : ', credential)
+      }
+    },
+  }
+
+  const handleGithubLoginClick = async () => {
+    socialLogin.onClick('github')
+  }
+
+  const handleGoogleLoginClick = async () => {
+    socialLogin.onClick('google')
+  }
 
   return (
     <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -35,7 +71,7 @@ function Auth({ pageName, errorMsg, setErrorMsg, onSubmit }: Props) {
 
         <form
           className="mt-8 space-y-6"
-          onSubmit={handleSubmit(onSubmit(auth))}
+          onSubmit={handleSubmit(onSubmit(firebaseAuth))}
         >
           <EmailPWForm register={register} setErrorMsg={setErrorMsg} />
 
@@ -109,4 +145,4 @@ function Auth({ pageName, errorMsg, setErrorMsg, onSubmit }: Props) {
   )
 }
 
-export default Auth
+export default SigninAndSignup

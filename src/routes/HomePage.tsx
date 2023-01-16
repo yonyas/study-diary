@@ -1,5 +1,7 @@
+import { signOut } from 'Auth/useAuthState'
+
 function HomePage() {
-  return <div>Home</div>
+  return <div onClick={() => signOut()}>Home</div>
 }
 
 export default HomePage
