@@ -1,4 +1,5 @@
-import { initializeApp } from 'firebase/app'
+import firebase, { initializeApp } from 'firebase/app'
+import { getDatabase } from 'firebase/database'
 
 export const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -8,6 +9,8 @@ export const firebaseConfig = {
   messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
   appId: process.env.REACT_APP_APP_ID,
   measurementId: process.env.REACT_APP_MEASUREMENT_ID,
+  databaseURL: process.env.REACT_APP_DATABASE_URL,
 }
 
 export const firebaseApp = initializeApp(firebaseConfig)
+export const db = getDatabase(firebaseApp)

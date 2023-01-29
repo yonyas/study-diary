@@ -2,13 +2,18 @@ import { useState } from 'react'
 import moment from 'moment'
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
+import { ref, set } from 'firebase/database'
 
 import { MdOutlineAddCircleOutline } from 'react-icons/md'
 import { TiDelete } from 'react-icons/ti'
 import { useForm } from 'react-hook-form'
 
+import { db } from 'firebaseConfig'
+import { useAuthState } from 'hooks/useAuthState'
+
 function HomePage() {
-  const [value, onDateChange] = useState(new Date())
+  const [date, setDate] = useState(new Date())
+  const { user } = useAuthState()
 
   const {
     register,
@@ -16,11 +21,20 @@ function HomePage() {
     formState: { errors },
   } = useForm()
 
+  const onDateChange = (date: any) => {
+    setDate(date)
+  }
+
   const onChange = (e: any) => {
     //TODO: api 보내기
   }
 
-  const onAddClick = (data: any) => {}
+  const onAddClick = (data: any) => {
+    set(ref(db, `user/${user?.uid}/todos/date/${date}`), {
+      name: data.new,
+      completed: false,
+    })
+  }
 
   const onDeleteClick = (e: any) => {
     e.preventDefafult()
@@ -31,7 +45,7 @@ function HomePage() {
       <div className="">
         <Calendar
           onChange={onDateChange}
-          value={value}
+          value={date}
           locale="ko"
           formatDay={(_, date) => moment(date).format('DD')}
           minDetail="month"
@@ -41,12 +55,12 @@ function HomePage() {
       </div>
       <div className="w-6/12 p-6 border border-gray-300">
         <div className="text-gray-900 font-semibold text-2xl">
-          {moment(value).format('YYYY년 MM월 DD일')}
+          {moment(date).format('YYYY년 MM월 DD일')}
         </div>
 
         <div className="flex flex-col p-4 h-full overflow-auto">
           {sampleList?.map(({ id, name, completed }) => (
-            <div className="flex justify-between items-center p-2">
+            <div key={id} className="flex justify-between items-center p-2">
               <div className="flex justify-center">
                 <form>
                   <input
