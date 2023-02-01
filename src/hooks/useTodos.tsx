@@ -47,11 +47,27 @@ export function useTodos(uid: string, date: Date) {
     ])
   }
 
+  const updatedTodo = (id, content, completed) => {
+    const newTodos = todos.map((todo) => {
+      if (todo.id == id) {
+        return {
+          ...todo,
+          content,
+          completed,
+        }
+      }
+      return todo
+    })
+
+    setTodos(newTodos)
+    set(ref(db, `user/${uid}/todos/date/${date}`), [...newTodos])
+  }
+
   const deleteTodo = (id) => {
     set(ref(db, `user/${uid}/todos/date/${date}`), [
       ...todos.filter((todo) => todo.id !== id),
     ])
   }
 
-  return { todos, addTodo, deleteTodo }
+  return { todos, addTodo, updatedTodo, deleteTodo }
 }

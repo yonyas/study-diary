@@ -2,19 +2,18 @@ import { ChangeEvent, useState } from 'react'
 import moment from 'moment'
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
-import { ref, set, update } from 'firebase/database'
 
 import { MdOutlineAddCircleOutline } from 'react-icons/md'
 import { TiDelete } from 'react-icons/ti'
 import { useForm } from 'react-hook-form'
 
-import { db } from 'firebaseConfig'
 import { useAuthState, useTodos } from 'hooks'
 
 function HomePage() {
   const [date, setDate] = useState<Date | null>(new Date())
   const { user } = useAuthState()
-  const { todos, addTodo, deleteTodo } = useTodos(user?.uid, date)
+  const { todos, addTodo, updatedTodo, deleteTodo } = useTodos(user?.uid, date)
+  console.log('todos: ', todos)
 
   const {
     register: todoRegister,
@@ -33,20 +32,10 @@ function HomePage() {
     setDate(date)
   }
 
-  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const onContentChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
 
-    set(ref(db, `user/${user?.uid}/todos/date/${date}`), [
-      ...todos.map((todo) => {
-        if (`todo${todo.id}` === name) {
-          return {
-            ...todo,
-            content: value,
-          }
-        }
-        return todo
-      }),
-    ])
+    updatedTodo(name, value, false)
   }
 
   const handleAddClick = (data: any) => {
@@ -59,20 +48,10 @@ function HomePage() {
     deleteTodo(id)
   }
 
-  const handleCheckChange = (e) => {
-    const { checked, name } = e.target
+  const handleCompleteChange = (e, content) => {
+    const { name: id, checked } = e.target
 
-    update(ref(db, `user/${user?.uid}/todos/date/${date}`), [
-      ...todos.map((todo) => {
-        if (`todo${todo.id}` === name) {
-          return {
-            ...todo,
-            completed: checked,
-          }
-        }
-        return todo
-      }),
-    ])
+    updatedTodo(id, content, checked)
   }
 
   return (
@@ -94,34 +73,34 @@ function HomePage() {
         </div>
 
         <div className="flex flex-col p-4 h-full overflow-auto">
-          {todos?.map(({ id, content, completed }) => (
-            <div
-              key={content}
-              className="flex justify-between items-center p-2"
-            >
-              <div className="flex justify-center">
-                <form>
-                  <input
-                    type="checkbox"
-                    checked={completed}
-                    name={content}
-                    onChange={handleCheckChange}
-                    className={`appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer`}
-                  />
-                  <input
-                    defaultValue={content}
-                    {...todoRegister(`todo${id}`, {
-                      required: true,
-                      onChange,
-                    })}
-                  />
-                  <button onClick={(e) => handleDeleteClick(e, id)}>
-                    <TiDelete size="24px" />
-                  </button>
-                </form>
+          {todos?.map(({ id, content, completed }) => {
+            console.log('completed: ', completed)
+            return (
+              <div key={id} className="flex justify-between items-center p-2">
+                <div className="flex justify-center">
+                  <form>
+                    <input
+                      type="checkbox"
+                      name={id.toString()}
+                      checked={completed}
+                      onChange={(e) => handleCompleteChange(e, content)}
+                      className={`appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer`}
+                    />
+                    <input
+                      defaultValue={content}
+                      {...todoRegister(id.toString(), {
+                        required: true,
+                        onChange: onContentChange,
+                      })}
+                    />
+                    <button onClick={(e) => handleDeleteClick(e, id)}>
+                      <TiDelete size="24px" />
+                    </button>
+                  </form>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
 
           {/* Add item */}
           <form
