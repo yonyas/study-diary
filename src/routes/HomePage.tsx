@@ -8,11 +8,16 @@ import { TiDelete } from 'react-icons/ti'
 import { useForm } from 'react-hook-form'
 
 import { useAuthState, useTodos } from 'hooks'
+import Loading from 'components/Loading'
 
 function HomePage() {
   const [date, setDate] = useState<Date | null>(new Date())
   const { user } = useAuthState()
-  const { todos, addTodo, updatedTodo, deleteTodo } = useTodos(user?.uid, date)
+  const { todos, loading, addTodo, updatedTodo, deleteTodo } = useTodos(
+    user?.uid,
+    date,
+  )
+  console.log(' loading: ', loading)
   console.log('todos: ', todos)
 
   const {
@@ -67,24 +72,29 @@ function HomePage() {
           showNeighboringMonth={false}
         />
       </div>
-      <div className="w-6/12 p-6 border border-gray-300">
-        <div className="text-gray-900 font-semibold text-2xl">
+
+      <div className="w-5/12 border border-gray-400">
+        <div className="p-6 pb-0 text-gray-900 font-semibold text-2xl">
           {moment(date).format('YYYY년 MM월 DD일')}
         </div>
 
-        <div className="flex flex-col p-4 h-full overflow-auto">
-          {todos?.map(({ id, content, completed }) => {
-            console.log('completed: ', completed)
-            return (
-              <div key={id} className="flex justify-between items-center p-2">
-                <div className="flex justify-center">
-                  <form>
+        <div className="flex flex-col h-full p-6 overflow-auto align-center">
+          {loading ? (
+            <Loading size={'20px'} />
+          ) : (
+            todos?.map(({ id, content, completed }) => {
+              return (
+                <div
+                  key={id}
+                  className="flex justify-between items-center mb-4 w-full"
+                >
+                  <form className="flex items-center gap-4 grow-1 shrink-0 min-width-[calc(100%-2rem)] w-[calc(100%-2rem)]">
                     <input
                       type="checkbox"
                       name={id.toString()}
                       checked={completed}
                       onChange={(e) => handleCompleteChange(e, content)}
-                      className={`appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer`}
+                      className={`appearance-none h-4 w-4 border border-gray-400 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain mr-2 cursor-pointer`}
                     />
                     <input
                       defaultValue={content}
@@ -92,15 +102,16 @@ function HomePage() {
                         required: true,
                         onChange: onContentChange,
                       })}
+                      className="border border-gray-300 rounded px-2 py-1 w-full focus:outline-none focus:border-blue-600"
                     />
-                    <button onClick={(e) => handleDeleteClick(e, id)}>
-                      <TiDelete size="24px" />
-                    </button>
                   </form>
+                  <button onClick={(e) => handleDeleteClick(e, id)}>
+                    <TiDelete size="24px" />
+                  </button>
                 </div>
-              </div>
-            )
-          })}
+              )
+            })
+          )}
 
           {/* Add item */}
           <form
@@ -109,7 +120,7 @@ function HomePage() {
           >
             <input
               placeholder="enter..."
-              className=" px-2 py-1 border border-gray-300"
+              className="w-full px-2 py-1 border border-gray-300 rounded"
               {...addItemRegister('new', { required: true })}
             />
             <button type="submit" className="cursor-pointer">

@@ -1,25 +1,18 @@
 import { useEffect, useState } from 'react'
-import { ref, onValue, get, child, set } from 'firebase/database'
+import moment from 'moment'
+import { ref, onValue, set } from 'firebase/database'
 
 import { db } from 'firebaseConfig'
 import { Todo } from 'types'
 
 export function useTodos(uid: string, date: Date) {
   const [todos, setTodos] = useState<null | Todo[]>(null)
+  const [loading, setLoading] = useState(false)
+  const dateWithoutTime = moment(date).format('YYYY-MM-DD')
 
   useEffect(() => {
-    const dbRef = ref(db)
-    const todosRef = ref(db, `user/${uid}/todos/date/${date}`)
-
-    const getData = async () =>
-      get(child(dbRef, `user/${uid}/todos/date/${date}`)).then((snapshot) => {
-        if (snapshot.exists()) {
-          setTodos(snapshot.val())
-        } else {
-          setTodos([])
-        }
-      })
-    getData()
+    setLoading(true)
+    const todosRef = ref(db, `user/${uid}/todos/date/${dateWithoutTime}`)
 
     const unsubscribe = onValue(todosRef, (snapshot) => {
       const data = snapshot.val()
@@ -28,16 +21,16 @@ export function useTodos(uid: string, date: Date) {
       } else {
         setTodos([])
       }
+      setLoading(false)
     })
 
     return () => {
-      getData()
       unsubscribe()
     }
   }, [uid, date])
 
   const addTodo = (data) => {
-    set(ref(db, `user/${uid}/todos/date/${date}`), [
+    set(ref(db, `user/${uid}/todos/date/${dateWithoutTime}`), [
       ...todos,
       {
         id: todos.length + 1,
@@ -60,14 +53,14 @@ export function useTodos(uid: string, date: Date) {
     })
 
     setTodos(newTodos)
-    set(ref(db, `user/${uid}/todos/date/${date}`), [...newTodos])
+    set(ref(db, `user/${uid}/todos/date/${dateWithoutTime}`), [...newTodos])
   }
 
   const deleteTodo = (id) => {
-    set(ref(db, `user/${uid}/todos/date/${date}`), [
+    set(ref(db, `user/${uid}/todos/date/${dateWithoutTime}`), [
       ...todos.filter((todo) => todo.id !== id),
     ])
   }
 
-  return { todos, addTodo, updatedTodo, deleteTodo }
+  return { todos, loading, addTodo, updatedTodo, deleteTodo }
 }
