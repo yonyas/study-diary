@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useRef, useState } from 'react'
 import moment from 'moment'
 import Calendar from 'react-calendar'
 import { Controller, useForm } from 'react-hook-form'
@@ -7,11 +7,13 @@ import 'react-calendar/dist/Calendar.css'
 import { TiDelete } from 'react-icons/ti'
 import { MdOutlineAddCircleOutline } from 'react-icons/md'
 
-import { useAuthState, useTodos } from 'hooks'
+import { useAuthState, useScrollToBottom, useTodos } from 'hooks'
 import Loading from 'components/Loading'
 
 function HomePage() {
   const [date, setDate] = useState<Date | null>(new Date())
+  const $todosRef = useRef<HTMLDivElement>(null)
+
   const { user } = useAuthState()
   const { todos, loading, addTodo, updatedTodo, deleteTodo } = useTodos(
     user?.uid,
@@ -56,6 +58,8 @@ function HomePage() {
     updatedTodo(id, content, checked)
   }
 
+  useScrollToBottom($todosRef, todos)
+
   return (
     <div className="flex justify-center p-12 gap-4 h-screen w-4xl">
       <div className="">
@@ -69,12 +73,15 @@ function HomePage() {
         />
       </div>
 
-      <div className="w-5/12 border border-gray-400">
-        <div className="p-6 pb-0 text-gray-900 font-semibold text-2xl">
+      <div className="relative w-5/12 border border-gray-400">
+        <div className="p-6 text-gray-900 font-semibold text-2xl">
           {moment(date).format('YYYY년 MM월 DD일')}
         </div>
 
-        <div className="flex flex-col p-6 overflow-auto align-center h-[calc(100%-56px)]">
+        <div
+          ref={$todosRef}
+          className="flex flex-col px-6 overflow-auto align-center h-[calc(100%-140px)]"
+        >
           {loading ? (
             <Loading size={'20px'} />
           ) : (
@@ -111,7 +118,7 @@ function HomePage() {
                             }}
                             className={`rounded px-2 py-1 w-full ${
                               completed && 'text-gray-500 line-through'
-                            }  focus:outline-none focus:border-blue-600`}
+                            } focus:outline-none focus:border-blue-600`}
                           />
                         )
                       }}
@@ -128,11 +135,11 @@ function HomePage() {
           {/* Add item */}
           <form
             onSubmit={addItemHandleSubmit(handleAddClick)}
-            className="flex gap-2 items-center"
+            className="flex gap-2 items-center absolute bottom-0 left-0 w-full bg-white p-4 border-t border-gray-300"
           >
             <input
               placeholder="무엇을 할 건가요?"
-              className="w-full px-2 py-1 border border-gray-300 rounded"
+              className="w-full line-height-1.2 px-2 py-1 border border-gray-300 rounded"
               {...addItemRegister('new', { required: true })}
             />
             <button type="submit" className="cursor-pointer">
