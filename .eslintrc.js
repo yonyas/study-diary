@@ -1,17 +1,14 @@
 module.exports = {
-  env: {
-    browser: true,
-    es2021: true,
-  },
-  extends: ['plugin:react/recommended', 'standard-with-typescript'],
-  overrides: [],
+  // extends: ['plugin:react/recommended', 'standard-with-typescript'],
+  // overrides: [],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
+    project: './tsconfig.json',
   },
-  plugins: ['react'],
+  plugins: ['react', '@typescript-eslint'],
   rules: {
-    'comma-dangle': ['error', 'always-multiline'],
+    'comma-dangle': 'off',
     'react/jsx-key': 'off',
     'react/display-name': 'off',
     'react/no-children-prop': 'off',
@@ -31,5 +28,6 @@ module.exports = {
     'testing-library/render-result-naming-convention': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/consistent-type-definitions': 'off',
   },
 }

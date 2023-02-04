@@ -17,7 +17,7 @@ const RouterRender = ({ authState }: Props) => {
       <SignInPage />
     )
   ) : (
-    <Loading />
+    <Loading size="full" />
   )
 
   return (

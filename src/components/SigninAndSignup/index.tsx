@@ -11,7 +11,7 @@ import { FirebaseError } from 'firebase/app'
 
 import { AuthInputs } from 'types'
 import EmailPWForm from './EmailPWForm'
-import { firebaseAuth } from 'Auth/useAuthState'
+import { firebaseAuth } from 'hooks'
 
 type Props = {
   pageName: 'Sign in' | 'Sign up'

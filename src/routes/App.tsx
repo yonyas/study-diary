@@ -1,5 +1,5 @@
 import RouterRender from './Router'
-import { useAuthState } from 'Auth/useAuthState'
+import { useAuthState } from 'hooks'
 
 function App() {
   const authState = useAuthState()
