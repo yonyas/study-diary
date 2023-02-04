@@ -1,11 +1,11 @@
 import { ChangeEvent, useState } from 'react'
 import moment from 'moment'
 import Calendar from 'react-calendar'
+import { Controller, useForm } from 'react-hook-form'
 import 'react-calendar/dist/Calendar.css'
 
-import { MdOutlineAddCircleOutline } from 'react-icons/md'
 import { TiDelete } from 'react-icons/ti'
-import { useForm } from 'react-hook-form'
+import { MdOutlineAddCircleOutline } from 'react-icons/md'
 
 import { useAuthState, useTodos } from 'hooks'
 import Loading from 'components/Loading'
@@ -17,34 +17,31 @@ function HomePage() {
     user?.uid,
     date,
   )
-  console.log(' loading: ', loading)
-  console.log('todos: ', todos)
 
-  const {
-    register: todoRegister,
-    handleSubmit: todoHandleSubmit,
-    formState: { errors: todoErrors },
-  } = useForm()
+  const { control } = useForm()
 
   const {
     register: addItemRegister,
     handleSubmit: addItemHandleSubmit,
     reset: addItemReset,
-    formState: { errors: addErrors },
   } = useForm()
 
   const handleDateChange = (date: Date) => {
     setDate(date)
+    addItemReset()
   }
 
   const onContentChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
+    const { name: id, value } = e.target
 
-    updatedTodo(name, value, false)
+    updatedTodo(id, value, false)
   }
 
-  const handleAddClick = (data: any) => {
-    addTodo(data)
+  const handleAddClick = (data: { new: string }) => {
+    const { new: content } = data
+    if (content.trim() === '') return
+
+    addTodo(content)
     addItemReset()
   }
 
@@ -69,7 +66,6 @@ function HomePage() {
           formatDay={(_, date) => moment(date).format('DD')}
           minDetail="month"
           maxDetail="month"
-          showNeighboringMonth={false}
         />
       </div>
 
@@ -78,7 +74,7 @@ function HomePage() {
           {moment(date).format('YYYY년 MM월 DD일')}
         </div>
 
-        <div className="flex flex-col h-full p-6 overflow-auto align-center">
+        <div className="flex flex-col p-6 overflow-auto align-center h-[calc(100%-56px)]">
           {loading ? (
             <Loading size={'20px'} />
           ) : (
@@ -88,7 +84,12 @@ function HomePage() {
                   key={id}
                   className="flex justify-between items-center mb-4 w-full"
                 >
-                  <form className="flex items-center gap-4 grow-1 shrink-0 min-width-[calc(100%-2rem)] w-[calc(100%-2rem)]">
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault()
+                    }}
+                    className="flex items-center gap-4 grow-1 shrink-0 min-width-[calc(100%-2rem)] w-[calc(100%-2rem)]"
+                  >
                     <input
                       type="checkbox"
                       name={id.toString()}
@@ -96,13 +97,24 @@ function HomePage() {
                       onChange={(e) => handleCompleteChange(e, content)}
                       className={`appearance-none h-4 w-4 border border-gray-400 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain mr-2 cursor-pointer`}
                     />
-                    <input
-                      defaultValue={content}
-                      {...todoRegister(id.toString(), {
-                        required: true,
-                        onChange: onContentChange,
-                      })}
-                      className="border border-gray-300 rounded px-2 py-1 w-full focus:outline-none focus:border-blue-600"
+                    <Controller
+                      control={control}
+                      name={id.toString() + content}
+                      render={({ field: { onChange } }) => {
+                        return (
+                          <input
+                            name={id.toString()}
+                            value={content}
+                            onChange={(e) => {
+                              onContentChange(e)
+                              onChange(e.target.value)
+                            }}
+                            className={`rounded px-2 py-1 w-full ${
+                              completed && 'text-gray-500 line-through'
+                            }  focus:outline-none focus:border-blue-600`}
+                          />
+                        )
+                      }}
                     />
                   </form>
                   <button onClick={(e) => handleDeleteClick(e, id)}>
@@ -119,7 +131,7 @@ function HomePage() {
             className="flex gap-2 items-center"
           >
             <input
-              placeholder="enter..."
+              placeholder="무엇을 할 건가요?"
               className="w-full px-2 py-1 border border-gray-300 rounded"
               {...addItemRegister('new', { required: true })}
             />

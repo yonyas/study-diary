@@ -7,7 +7,15 @@ export type LoadingProps = {
 }
 
 function Loading({ type = 'spin', size }: LoadingProps) {
-  return <ReactLoading type={type} color={'gray'} height={size} width={size} />
+  return (
+    <div
+      className={`flex items-center justify-center ${
+        size === 'full' && 'h-screen'
+      }`}
+    >
+      <ReactLoading type={type} color={'gray'} height={size} width={size} />
+    </div>
+  )
 }
 
 export default Loading

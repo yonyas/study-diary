@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useMemo, useEffect, useState } from 'react'
 import moment from 'moment'
 import { ref, onValue, set } from 'firebase/database'
 
@@ -8,16 +8,18 @@ import { Todo } from 'types'
 export function useTodos(uid: string, date: Date) {
   const [todos, setTodos] = useState<null | Todo[]>(null)
   const [loading, setLoading] = useState(false)
-  const dateWithoutTime = moment(date).format('YYYY-MM-DD')
+  const dateWithoutTime = useMemo(() => moment(date).format('YYYY-MM-DD'), [
+    date,
+  ])
 
   useEffect(() => {
     setLoading(true)
     const todosRef = ref(db, `user/${uid}/todos/date/${dateWithoutTime}`)
 
     const unsubscribe = onValue(todosRef, (snapshot) => {
-      const data = snapshot.val()
-      if (data !== null) {
-        setTodos(data)
+      const todos = snapshot.val()
+      if (todos !== null) {
+        setTodos(todos)
       } else {
         setTodos([])
       }
@@ -29,12 +31,14 @@ export function useTodos(uid: string, date: Date) {
     }
   }, [uid, date])
 
-  const addTodo = (data) => {
+  const addTodo = (content) => {
+    const id = getNewId(todos)
+
     set(ref(db, `user/${uid}/todos/date/${dateWithoutTime}`), [
       ...todos,
       {
-        id: todos.length + 1,
-        content: data.new,
+        id,
+        content: content,
         completed: false,
       },
     ])
@@ -63,4 +67,9 @@ export function useTodos(uid: string, date: Date) {
   }
 
   return { todos, loading, addTodo, updatedTodo, deleteTodo }
+}
+
+const getNewId = (todos) => {
+  if (todos.length === 0) return 1
+  else return todos[todos.length - 1].id + 1
 }
